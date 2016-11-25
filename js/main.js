@@ -1,4 +1,4 @@
-var game = new Phaser.Game(1347, 539, Phaser.CANVAS, 'gameDiv');
+var game = new Phaser.Game(1000, 530, Phaser.CANVAS, 'gameDiv');
 //var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
 
 
@@ -94,7 +94,7 @@ var mainState = {
 		me.addPlatform();
  
 		//Add a platform every 3 seconds
-		me.timer = game.time.events.loop(2000, me.addPlatform, me);
+		me.timer = game.time.events.loop(1500, me.addPlatform, me);
 		
 		//Add particle emitter for death animation
 		me.emitter = game.add.emitter(0, 0, 20);
@@ -105,6 +105,7 @@ var mainState = {
 		me.tileemitter = game.add.emitter(0, 0, 90);
 		me.tileemitter.makeParticles('green_explode');
 		me.tileemitter.gravity = 1000;
+		me.tileemitter.setXSpeed(0, -1000);
 		
 		//make emitter for player trail
 		me.movingEmitter = game.add.emitter(me.player.x + 10, me.player.y, 2000);
