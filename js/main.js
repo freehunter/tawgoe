@@ -1,5 +1,5 @@
-//var game = new Phaser.Game(890, 600, Phaser.CANVAS, 'gameDiv');
-var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(1347, 539, Phaser.CANVAS, 'gameDiv');
+//var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
 
 
 
@@ -13,6 +13,10 @@ var mainState = {
     	this.game.load.image('explode', 'assets/explode.png'); 
     	this.game.load.image('green_explode', 'assets/green_tile_explode.png');
     	this.game.load.image('player', 'assets/player.png'); 
+    	
+    	//background music courtesy of ShadyDave
+    	//https://www.freesound.org/people/ShadyDave/sounds/277325/
+    	this.game.load.audio('bgm', ['assets/time-break.wav', 'assets/time-break.mp3']);
     	
     	this.score = 0; 
     },
@@ -86,7 +90,7 @@ var mainState = {
 		//Add particle emitter for death animation
 		me.emitter = game.add.emitter(0, 0, 20);
 		me.emitter.makeParticles('explode');
-		me.emitter.gravity = 200;
+		me.emitter.gravity = 100;
 		
 		//make emitter for tile explode
 		me.tileemitter = game.add.emitter(0, 0, 90);
@@ -104,6 +108,8 @@ var mainState = {
 		me.movingEmitter.setScale(0.6, 0.6, 0.5, 0.5, 2000, Phaser.Easing.Quintic.Out);
 		
 		me.movingEmitter.start(false, 5000, 10)
+		
+		this.loadSounds();
 		
     },
 
@@ -124,6 +130,14 @@ var mainState = {
 		//me.movingParticleBurst(me.player.body.position.x + (me.player.body.width / 2), me.player.body.position.y + (me.player.body.height / 2));
 	            
 	},
+	
+loadSounds: function() {
+        this.bgmSound = game.add.audio('bgm');
+        this.bgmSound.volume = 0.5;
+        this.bgmSound.loop = true;
+        this.bgmSound.sound = 0.8;
+        this.bgmSound.play();
+    },
 
 collideTile: function(player, tile){
 	var me = this;
@@ -212,6 +226,7 @@ gameOver: function(){
     //Wait a little bit before restarting game
     me.game.time.events.add(1000, function(){
         me.game.state.start('main');
+        me.bgmSound.stop();
     }, me);
  
 },
