@@ -1,5 +1,5 @@
-var game = new Phaser.Game(890, 600, Phaser.CANVAS, 'gameDiv');
-//var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
+//var game = new Phaser.Game(890, 600, Phaser.CANVAS, 'gameDiv');
+var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
 
 
 
@@ -11,6 +11,7 @@ var mainState = {
     	this.game.load.image('tile', 'assets/tile1.png'); 
     	this.game.load.image('tile2', 'assets/tile2.png');
     	this.game.load.image('explode', 'assets/explode.png'); 
+    	this.game.load.image('green_explode', 'assets/green_tile_explode.png');
     	this.game.load.image('player', 'assets/player.png'); 
     	
     	this.score = 0; 
@@ -30,7 +31,7 @@ var mainState = {
     	me.game.physics.arcade.enable(me.player);
  	
     	//Make the player fall by applying gravity
-    	me.player.body.gravity.y = 2000;
+    	me.player.body.gravity.y = 1500;
  	
     	//Make the player collide with the game boundaries 
     	me.player.body.collideWorldBounds = true;
@@ -56,7 +57,7 @@ var mainState = {
     	me.tileHeight = me.game.cache.getImage('tile').height;
  	
     	//Set the background colour to blue
-    	me.game.stage.backgroundColor = '479cde';
+    	me.game.stage.backgroundColor = '424242';
  	
     	//Enable the Arcade physics system
     	me.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -80,12 +81,29 @@ var mainState = {
 		me.addPlatform();
  
 		//Add a platform every 3 seconds
-		me.timer = game.time.events.loop(3000, me.addPlatform, me);
+		me.timer = game.time.events.loop(2000, me.addPlatform, me);
 		
 		//Add particle emitter for death animation
 		me.emitter = game.add.emitter(0, 0, 20);
 		me.emitter.makeParticles('explode');
 		me.emitter.gravity = 200;
+		
+		//make emitter for tile explode
+		me.tileemitter = game.add.emitter(0, 0, 90);
+		me.tileemitter.makeParticles('green_explode');
+		me.tileemitter.gravity = 200;
+		
+		//make emitter for player trail
+		me.movingEmitter = game.add.emitter(me.player.x + 10, me.player.y, 2000);
+		me.movingEmitter.width = 10;
+		me.movingEmitter.makeParticles('explode');
+		//me.movingEmitter.setYSpeed(0, -10);
+		me.movingEmitter.setXSpeed(0, -1000);
+		me.movingEmitter.gravity = 500;
+		me.movingEmitter.setRotation(90,-90)
+		me.movingEmitter.setScale(0.6, 0.6, 0.5, 0.5, 2000, Phaser.Easing.Quintic.Out);
+		
+		me.movingEmitter.start(false, 5000, 10)
 		
     },
 
@@ -99,15 +117,23 @@ var mainState = {
 		me.game.physics.arcade.collide(me.breakables, me.platforms);
  		
 		this.input.onDown.add(this.onTap, this);
+		
+		me.player.angle += 4;
+		
+		me.movingEmitter.y = me.player.body.position.y + (me.player.body.height / 2);
+		//me.movingParticleBurst(me.player.body.position.x + (me.player.body.width / 2), me.player.body.position.y + (me.player.body.height / 2));
 	            
 	},
 
 collideTile: function(player, tile){
-    tile.body.gravity.y = 2000;
+	var me = this;
+    //tile.body.gravity.y = 1500;
+    me.tileparticleBurst(tile.body.position.x - (tile.body.width / 2), tile.body.position.y + (tile.body.height / 2));
+    tile.kill()
 },
 
 onTap: function(pointer, doubleTap){
-	this.player.body.velocity.y -= 800;
+	this.player.body.velocity.y -= 700;
 },
        
 addTile: function(x, y, immovable){
@@ -167,12 +193,22 @@ particleBurst: function(x, y){
     me.emitter.start(true, 2000, null, 20);
 },
 
+tileparticleBurst: function(x, y){
+    var me = this;
+ 
+    me.tileemitter.x = x;
+    me.tileemitter.y = y;
+ 
+    me.tileemitter.start(true, 2000, null, 20);
+},
+
 gameOver: function(){
     var me = this;
  
     me.particleBurst(me.player.body.position.x + (me.player.body.width / 2), me.player.body.position.y + (me.player.body.height / 2));
     me.player.kill();
- 
+    me.movingEmitter.on = false;
+     
     //Wait a little bit before restarting game
     me.game.time.events.add(1000, function(){
         me.game.state.start('main');
