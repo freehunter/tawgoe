@@ -15,8 +15,17 @@ var mainState = {
     	this.game.load.image('player', 'assets/player.png'); 
     	
     	//background music courtesy of ShadyDave
-    	//https://www.freesound.org/people/ShadyDave/sounds/277325/
+    	//https://www.freesound.org/people/ShadyDave
     	this.game.load.audio('bgm', ['assets/time-break.wav', 'assets/time-break.mp3']);
+    	//courtesy of mickeyman5000
+    	//http://www.freesound.org/people/mickyman5000/
+    	this.game.load.audio('crash', ['assets/crash.wav']);
+    	//courtesy of farbin
+    	//http://www.freesound.org/people/farbin/
+    	this.game.load.audio('cardboard', ['assets/cardboard.wav']);
+    	//courtesy of anagar
+    	//http://www.freesound.org/people/anagar
+    	this.game.load.audio('whoosh', ['assets/whoosh.wav']);
     	
     	this.score = 0; 
     },
@@ -95,7 +104,7 @@ var mainState = {
 		//make emitter for tile explode
 		me.tileemitter = game.add.emitter(0, 0, 90);
 		me.tileemitter.makeParticles('green_explode');
-		me.tileemitter.gravity = 200;
+		me.tileemitter.gravity = 1000;
 		
 		//make emitter for player trail
 		me.movingEmitter = game.add.emitter(me.player.x + 10, me.player.y, 2000);
@@ -135,8 +144,15 @@ loadSounds: function() {
         this.bgmSound = game.add.audio('bgm');
         this.bgmSound.volume = 0.5;
         this.bgmSound.loop = true;
-        this.bgmSound.sound = 0.8;
+        this.bgmSound.sound = 0.5;
         this.bgmSound.play();
+        
+        this.crash = game.add.audio('crash');
+        this.crash.volume = 1;
+        this.cardboard = game.add.audio('cardboard');
+        this.cardboard.volume = 0.5;
+        this.whoosh = game.add.audio('whoosh');
+        this.whoosh.volume = 0.5;
     },
 
 collideTile: function(player, tile){
@@ -144,10 +160,12 @@ collideTile: function(player, tile){
     //tile.body.gravity.y = 1500;
     me.tileparticleBurst(tile.body.position.x - (tile.body.width / 2), tile.body.position.y + (tile.body.height / 2));
     tile.kill()
+    this.cardboard.play();
 },
 
 onTap: function(pointer, doubleTap){
 	this.player.body.velocity.y -= 700;
+	this.whoosh.play();
 },
        
 addTile: function(x, y, immovable){
@@ -222,6 +240,8 @@ gameOver: function(){
     me.particleBurst(me.player.body.position.x + (me.player.body.width / 2), me.player.body.position.y + (me.player.body.height / 2));
     me.player.kill();
     me.movingEmitter.on = false;
+    me.bgmSound.stop();
+    this.crash.play();
      
     //Wait a little bit before restarting game
     me.game.time.events.add(1000, function(){
