@@ -1,5 +1,5 @@
-//var game = new Phaser.Game(400, 490, Phaser.CANVAS, 'gameDiv');
-var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(890, 600, Phaser.CANVAS, 'gameDiv');
+//var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'gameDiv');
 
 
 
@@ -98,14 +98,7 @@ var mainState = {
 		me.game.physics.arcade.collide(me.player, me.breakables, me.collideTile, null, me);
 		me.game.physics.arcade.collide(me.breakables, me.platforms);
  		
-		//Make the sprite jump when the up key is pushed
-		//if(me.cursors.up.isDown) {
-    	//	me.player.body.velocity.y -= 80;
-		//}
-	    //this works for clicking mouse and touching a screen
-        this.input.onDown.add(this.onTap, this);  
-        //game.input.onDown.add(this.moveCharacter, this);
-
+		this.input.onDown.add(this.onTap, this);
 	            
 	},
 
